@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public CharacterController controller;
     private Vector3 moveDirection;
+    public float gravityScale;
 
     // Start is called before the first frame update
     void Start()
@@ -31,8 +32,13 @@ public class PlayerController : MonoBehaviour
         moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, 0f, Input.GetAxis("Vertical") * moveSpeed);
         if (Input.GetButtonDown("Jump"))
         {
-            moveDirection.y = jumpForce;
+            if (Physics.Raycast(transform.position, Vector3.down, 1.1f))
+            {
+                moveDirection.y = jumpForce;
+            }
         }
+        //if (Physics.Raycast(transform.position, Vector3.down, 1.1f))
+        moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale);
         controller.Move(moveDirection * Time.deltaTime);
     }
 }

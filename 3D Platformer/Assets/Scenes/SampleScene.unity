@@ -899,8 +899,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  jumpForce: 0
+  jumpForce: 100
   controller: {fileID: 0}
+  gravityScale: 0
 --- !u!143 &1624638321
 CharacterController:
   m_ObjectHideFlags: 0
