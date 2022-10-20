@@ -29,16 +29,20 @@ public class PlayerController : MonoBehaviour
         {
             theRB.velocity = new Vector3(theRB.velocity.x,jumpForce,theRB.velocity.y);
         }*/
-        moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, 0f, Input.GetAxis("Vertical") * moveSpeed);
-        if (Input.GetButtonDown("Jump"))
+        moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, moveDirection.y, Input.GetAxis("Vertical") * moveSpeed);
+    
+        if (controller.isGrounded)
         {
-            if (Physics.Raycast(transform.position, Vector3.down, 1.1f))
+            if (Input.GetButtonDown("Jump"))
             {
-                moveDirection.y = jumpForce;
+                if (Physics.Raycast(transform.position, Vector3.down, 1.1f))
+                {
+                    moveDirection.y = jumpForce;
+                }
             }
         }
         //if (Physics.Raycast(transform.position, Vector3.down, 1.1f))
-        moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale);
+        moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale * Time.deltaTime);
         controller.Move(moveDirection * Time.deltaTime);
     }
 }
