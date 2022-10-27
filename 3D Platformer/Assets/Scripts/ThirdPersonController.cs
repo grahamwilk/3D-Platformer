@@ -17,6 +17,7 @@ public class ThirdPersonController : MonoBehaviour
     public Transform cam;
     public float jumpForce = 20f;
     public float gravityScale = 4.9f;
+    public Animator anim;
 
     // private variables for basic movement
     private Vector3 velocity;
@@ -68,6 +69,7 @@ public class ThirdPersonController : MonoBehaviour
         MovePlayer();
         DrawDebugLines();
         CalculateSlope();
+        Animation();
     }
 
     // Retrieves the input from the player
@@ -151,5 +153,10 @@ public class ThirdPersonController : MonoBehaviour
 
         Debug.DrawLine(player.position, player.position + crossUp * 2 * 2, Color.red);
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 2, Color.yellow);
+    }
+    void Animation()
+    {
+        anim.SetBool("isGrounded", controller.isGrounded);
+        anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
     }
 }
