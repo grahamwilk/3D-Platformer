@@ -130,7 +130,7 @@ public class ThirdPersonController : MonoBehaviour
     // uh oh
     void CalculateSlope()
     {
-        if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.3f, ground))
+        if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.15f, ground))
         {
             Vector3 normal = hitInfo.normal;
             Vector3 up = player.transform.up;
