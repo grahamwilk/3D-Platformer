@@ -31,27 +31,19 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 crossUp;
     private Vector3 normal;
     private float angleVector;
+    private double movementStore;
+    private bool canMove = true;
+    private bool timeStored = false;
+    public float timeStore;
+    public bool bonking = false;
+    private Vector3 normalBonkVector;
+    public bool wallJumping = false;
 
-    private RaycastCommand groundingRay;
-    public float steepAngle = 120f;
-
+    public LayerMask wall;
     public LayerMask ground;
     private RaycastHit hitInfo;
     public bool debug;
 
-    /*
-    // public variables for slopes
-    public float height = 1f;
-    public float heightPadding = .1f;
-    public LayerMask ground;
-    public float maxGroundAngle = 120;
-    public bool debug;
-
-    // private variables for slopes
-    private float groundAngle;
-    private Vector3 forward;
-    private bool grounded;
-    */
 
     // Start is called before the first frame update
     void Start()
@@ -63,28 +55,38 @@ public class ThirdPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GetInput();
-        CalculateDirection();
+        // Enironment Checks
+        WallBonkAndJump();
+
+        // Turn player input into direction
+        GetDirection();
+
+        // Player movement methods
         CalculateVerticalMovement();
         MovePlayer();
-        DrawDebugLines();
-        CalculateSlope();
+
+        // Animations
         Animation();
+
+        // Methods for debugging
+        DrawDebugLines();
     }
 
     // Retrieves the input from the player
-    void GetInput()
+    void GetDirection()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 tempDirection = new Vector3(horizontal, 0f, vertical).normalized;
-        direction = tempDirection;
-    }
-
-    // Direction relative to the camera's rotation
-    void CalculateDirection()
-    {
-        targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        if (!canMove)
+        {
+            // pass
+        }
+        else
+        {
+            // calculate direction relative to camera's orientation
+            direction = new Vector3(horizontal, 0f, vertical).normalized;
+            targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        }
     }
 
     // Find the vertical component of our movement
@@ -99,7 +101,7 @@ public class ThirdPersonController : MonoBehaviour
         {
             velocity.y = -2f;
         }
-        if (Input.GetButtonDown("Jump") && Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.15f, ground))
+        if (Input.GetButtonDown("Jump") && (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.2f, ground) || controller.isGrounded))
         {
             velocity.y = jumpForce;
         }
@@ -113,11 +115,42 @@ public class ThirdPersonController : MonoBehaviour
     void MovePlayer()
     {
         // if the player is holding a direction, it will move them depending on where the camera is facing
-        if (direction.magnitude >= 0.1f /*&& groundAngle >= maxGroundAngle*/)
+        if (direction.magnitude >= 0.1f)
         {
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            if (!bonking || wallJumping)
+            {
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            }
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward * speed;
+            //convert character to slope movement if on slope
+            if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.2f, ground) && 35 >= Vector3.Angle(player.transform.up, hitInfo.normal))
+            {
+                Vector3 normal = hitInfo.normal;
+                Vector3 up = player.transform.up;
+                Vector3 cross = Vector3.Cross(up, normal);
+                float vectorAngle = Vector3.Angle(up, normal);
+                if (cross.magnitude > .0001)
+                {
+                    player.RotateAround(player.position, cross.normalized, vectorAngle);
+                }
+                Vector3 crossSide = Vector3.Cross(Vector3.up, normal);
+                Vector3 slopeVector = Vector3.Cross(normal, crossSide);
+                float radians = -vectorAngle * Mathf.Deg2Rad;
+                moveDir = Vector3.RotateTowards(moveDir, slopeVector, radians, 0);
+            }
+            else
+            {
+                Vector3 normal = Vector3.up;
+                Vector3 up = player.transform.up;
+                Vector3 cross = Vector3.Cross(up, normal);
+                float vectorAngle = Vector3.Angle(up, normal);
+                if (cross.magnitude > .0001)
+                {
+                    player.RotateAround(player.position, cross.normalized, vectorAngle);
+                }
+            }
+            movementStore = Math.Sqrt(Math.Pow(moveDir.x, 2) + Math.Pow(moveDir.z, 2));
             // add the vertical and horizontal movement vectors to get our total movement vector
             moveDir = moveDir + velocity;
             controller.Move(moveDir * Time.deltaTime);
@@ -126,37 +159,74 @@ public class ThirdPersonController : MonoBehaviour
         // if the player is not holding a direction, only gravity and jumping will be accounted for
         else
         {
+            //convert characters rotation if standing still on slope
+            if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.2f, ground) && 35 >= Vector3.Angle(player.transform.up, hitInfo.normal))
+            {
+                Vector3 normal = hitInfo.normal;
+                Vector3 up = player.transform.up;
+                Vector3 cross = Vector3.Cross(up, normal);
+                float vectorAngle = Vector3.Angle(up, normal);
+                if (cross.magnitude > .0001)
+                {
+                    player.RotateAround(player.position, cross.normalized, vectorAngle);
+                }
+            }
+            else
+            {
+                Vector3 normal = Vector3.up;
+                Vector3 up = player.transform.up;
+                Vector3 cross = Vector3.Cross(up, normal);
+                float vectorAngle = Vector3.Angle(up, normal);
+                if (cross.magnitude > .0001)
+                {
+                    player.RotateAround(player.position, cross.normalized, vectorAngle);
+                }
+            }
+            movementStore = 0f;
             controller.Move(velocity * Time.deltaTime);
         }
     }
-    // uh oh
-    void CalculateSlope()
-    {
-        if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.15f, ground))
-        {
-            Vector3 normal = hitInfo.normal;
-            Vector3 up = player.transform.up;
-            Vector3 cross = Vector3.Cross(up, normal);
-            float vectorAngle = Vector3.Angle(up, normal);
-            if (cross.magnitude > .0001)
-            {
-                player.RotateAround(player.position, cross.normalized, vectorAngle);
-            }
-            Vector3 crossUp = Vector3.Cross(Vector3.up, cross);
-            direction = Quaternion.AngleAxis(vectorAngle,crossUp.normalized) * direction;
-        }
-    }
+
 
     void DrawDebugLines()
     {
         if (!debug) return;
 
-        Debug.DrawLine(player.position, player.position + crossUp * 2 * 2, Color.red);
+        Debug.DrawLine(player.position, player.position + moveDir * 10, Color.red);
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 2, Color.yellow);
     }
     void Animation()
     {
         anim.SetBool("isGrounded", controller.isGrounded);
         anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
+    }
+    void WallBonkAndJump()
+    {
+        if (Physics.Raycast(transform.position, transform.forward, out hitInfo, .6f, wall) && movementStore > 0f && controller.isGrounded == false)
+        {
+            if (bonking == false || wallJumping == true)
+            {
+                timeStore = Time.time;
+                canMove = false;
+                normalBonkVector = hitInfo.normal.normalized;
+                direction = normalBonkVector * 20;
+                targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                bonking = true;
+            }
+        }
+        if (bonking && Time.time < timeStore + .25f && Input.GetButtonDown("Jump"))
+        {
+            velocity = new Vector3(0f, 20f, 0f);
+            direction = normalBonkVector * 75;
+            targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(targetAngle, 0f, 0f);
+            wallJumping = true;
+        }
+        if (bonking && controller.isGrounded)
+        {
+            canMove = true;
+            bonking = false;
+            wallJumping = false;
+        }
     }
 }
