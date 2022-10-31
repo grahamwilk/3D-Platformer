@@ -348,8 +348,8 @@ MonoBehaviour:
   m_BindingMode: 4
   m_SplineCurvature: 0.2
   m_Orbits:
-  - m_Height: 4.75
-    m_Radius: 10.73
+  - m_Height: 6
+    m_Radius: 8
   - m_Height: 3.21
     m_Radius: 13.58
   - m_Height: 0.1

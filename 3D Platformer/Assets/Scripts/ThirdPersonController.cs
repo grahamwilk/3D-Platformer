@@ -34,10 +34,13 @@ public class ThirdPersonController : MonoBehaviour
     private double movementStore;
     private bool canMove = true;
     private bool timeStored = false;
-    public float timeStore;
-    public bool bonking = false;
+    private float timeStore;
+    private bool bonking = false;
     private Vector3 normalBonkVector;
-    public bool wallJumping = false;
+    private bool wallJumping = false;
+    private bool punching = false;
+    private bool punchEnd = false;
+    private bool wallPunch = false;
 
     public LayerMask wall;
     public LayerMask ground;
@@ -57,6 +60,9 @@ public class ThirdPersonController : MonoBehaviour
     {
         // Enironment Checks
         WallBonkAndJump();
+
+        //punch
+        Punch();
 
         // Turn player input into direction
         GetDirection();
@@ -151,6 +157,8 @@ public class ThirdPersonController : MonoBehaviour
                 }
             }
             movementStore = Math.Sqrt(Math.Pow(moveDir.x, 2) + Math.Pow(moveDir.z, 2));
+            if (punching) { moveDir = moveDir * .5f; }
+            if (wallPunch) { moveDir = moveDir * 3f; }
             // add the vertical and horizontal movement vectors to get our total movement vector
             moveDir = moveDir + velocity;
             controller.Move(moveDir * Time.deltaTime);
@@ -214,7 +222,7 @@ public class ThirdPersonController : MonoBehaviour
                 bonking = true;
             }
         }
-        if (bonking && Time.time < timeStore + .25f && Input.GetButtonDown("Jump"))
+        if (bonking && Time.time < timeStore + .15f && Input.GetButtonDown("Jump"))
         {
             velocity = new Vector3(0f, 20f, 0f);
             direction = normalBonkVector * 75;
@@ -227,6 +235,41 @@ public class ThirdPersonController : MonoBehaviour
             canMove = true;
             bonking = false;
             wallJumping = false;
+        }
+    }
+    void Punch()
+    {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            if (controller.isGrounded == true && punching == false)
+            {
+                targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                timeStore = Time.time;
+                canMove = false;
+                punching = true;
+            }
+        }
+        if (punching)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out hitInfo, 1f, wall))
+            {
+                Vector3 normalPunchVector = hitInfo.normal.normalized;
+                direction = normalPunchVector;
+                targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                wallPunch = true;
+            }
+        }
+        if (punching && Time.time > timeStore + .5f)
+        {
+            direction = Vector3.zero;
+            punching = false;
+            wallPunch = false;
+            punchEnd = true;
+        }
+        if (punchEnd && Time.time > timeStore + .75f)
+        {
+            canMove = true;
+            punchEnd = false;
         }
     }
 }
