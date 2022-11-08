@@ -6,6 +6,7 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Windows;
+using UnityEngine.UIElements;
 
 public class ThirdPersonController : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class ThirdPersonController : MonoBehaviour
     public Transform cam;
     public float jumpForce = 20f;
     public float gravityScale = 4.9f;
-    public Animator anim;
+    //public Animator anim;
     public Health playerHealth;
     public Transform fist;
     public PunchCollision punchCollision;
@@ -80,7 +81,7 @@ public class ThirdPersonController : MonoBehaviour
         MovePlayer();
 
         // Animations
-        Animation();
+        //Animation();
 
         // Methods for debugging
         DrawDebugLines();
@@ -160,7 +161,8 @@ public class ThirdPersonController : MonoBehaviour
                 float vectorAngle = Vector3.Angle(up, normal);
                 if (cross.magnitude > .0001)
                 {
-                    player.RotateAround(player.position, cross.normalized, vectorAngle);
+                    transform.RotateAround(player.position, cross.normalized, vectorAngle);
+                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
                 Vector3 crossSide = Vector3.Cross(Vector3.up, normal);
                 Vector3 slopeVector = Vector3.Cross(normal, crossSide);
@@ -176,6 +178,7 @@ public class ThirdPersonController : MonoBehaviour
                 if (cross.magnitude > .0001)
                 {
                     player.RotateAround(player.position, cross.normalized, vectorAngle);
+                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
             }
             movementStore = Math.Sqrt(Math.Pow(moveDir.x, 2) + Math.Pow(moveDir.z, 2));
@@ -226,11 +229,11 @@ public class ThirdPersonController : MonoBehaviour
         Debug.DrawLine(transform.position, transform.position - Vector3.up * 2, Color.yellow);
     }
     // basic player animation
-    void Animation()
-    {
-        anim.SetBool("isGrounded", controller.isGrounded);
-        anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
-    }
+    //void Animation()
+    //{
+    //    anim.SetBool("isGrounded", controller.isGrounded);
+    //    anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
+    //}
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
     void WallBonkAndJump()
     {
