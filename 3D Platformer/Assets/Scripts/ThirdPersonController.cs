@@ -67,6 +67,7 @@ public class ThirdPersonController : MonoBehaviour
     void Update()
     {
         // Enironment Checks
+        Debug.Log("Hello");
         WallBonkAndJump();
 
         //punch
@@ -231,6 +232,7 @@ public class ThirdPersonController : MonoBehaviour
         anim.SetBool("isGrounded", controller.isGrounded);
         anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
     }
+   
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
     void WallBonkAndJump()
     {
