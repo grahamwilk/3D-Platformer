@@ -6,6 +6,7 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Windows;
+using UnityEngine.UIElements;
 
 public class ThirdPersonController : MonoBehaviour
 {
@@ -162,6 +163,7 @@ public class ThirdPersonController : MonoBehaviour
                 if (cross.magnitude > .0001)
                 {
                     player.RotateAround(player.position, cross.normalized, vectorAngle);
+                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
                 Vector3 crossSide = Vector3.Cross(Vector3.up, normal);
                 Vector3 slopeVector = Vector3.Cross(normal, crossSide);
@@ -177,6 +179,7 @@ public class ThirdPersonController : MonoBehaviour
                 if (cross.magnitude > .0001)
                 {
                     player.RotateAround(player.position, cross.normalized, vectorAngle);
+                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
             }
             movementStore = Math.Sqrt(Math.Pow(moveDir.x, 2) + Math.Pow(moveDir.z, 2));
