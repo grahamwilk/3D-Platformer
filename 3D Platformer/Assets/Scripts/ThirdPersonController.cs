@@ -52,6 +52,7 @@ public class ThirdPersonController : MonoBehaviour
     private GameObject enemyObjectStore;
     private bool wallJumpAnim;
     private float wallJumpAnimTimeStore;
+    private bool ableToWallJump;
 
     public LayerMask wall;
     public LayerMask ground;
@@ -240,6 +241,8 @@ public class ThirdPersonController : MonoBehaviour
         anim.SetBool("isBonking", bonking);
         anim.SetBool("isWallJumping", wallJumping);
         anim.SetBool("resetWallJump", wallJumpAnim);
+        anim.SetBool("isAbleToWallJump", ableToWallJump);
+        anim.SetBool("isPunching", punching);
     }
    
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
@@ -256,6 +259,7 @@ public class ThirdPersonController : MonoBehaviour
                 targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 bonking = true;
                 wallJumping = false;
+                ableToWallJump = true;
             }
         }
         if (bonking && Time.time < timeStore + .15f && Input.GetButtonDown("Jump"))
@@ -269,6 +273,10 @@ public class ThirdPersonController : MonoBehaviour
 
             wallJumpAnim = true;
             wallJumpAnimTimeStore = Time.time;
+        }
+        if (bonking && Time.time > timeStore + .15f)
+        {
+            ableToWallJump = false;
         }
         if (Time.time > wallJumpAnimTimeStore + .1f)
         {
@@ -340,7 +348,7 @@ public class ThirdPersonController : MonoBehaviour
             fist.position -= transform.forward;
         }
         // end of the punc
-        if (punchEnd && Time.time > timeStore + .75f)
+        if (punchEnd && Time.time > timeStore + .85f)
         {
             canMove = true;
             punchEnd = false;
