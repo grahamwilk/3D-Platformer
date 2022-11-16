@@ -104,6 +104,7 @@ public class ThirdPersonController : MonoBehaviour
             groundBonking = true;
             playerHealth.Damage(2);
             timeStore = Time.time;
+            FindObjectOfType<AudioManager>().Play("PlayerDamage");
         }
     }
     // Retrieves the input from the player
@@ -137,6 +138,7 @@ public class ThirdPersonController : MonoBehaviour
         }
         if (Input.GetButtonDown("Jump") && (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.2f, ground) || controller.isGrounded) && !bonking && !groundBonking)
         {
+            FindObjectOfType<AudioManager>().Play("Jump");
             velocity.y = jumpForce;
         }
         // apply gravity and take previous vertical speed into account
@@ -270,7 +272,7 @@ public class ThirdPersonController : MonoBehaviour
             transform.rotation = Quaternion.Euler(targetAngle, 0f, 0f);
             wallJumping = true;
             bonking = false;
-
+            FindObjectOfType<AudioManager>().Play("WallJump");
             wallJumpAnim = true;
             wallJumpAnimTimeStore = Time.time;
         }
@@ -294,6 +296,7 @@ public class ThirdPersonController : MonoBehaviour
             groundBonking = true;
             wallJumping = false;
             timeStore = Time.time;
+            FindObjectOfType<AudioManager>().Play("WallBonk");
         }
         if (groundBonking && Time.time > timeStore + 1f)
         {
@@ -315,6 +318,7 @@ public class ThirdPersonController : MonoBehaviour
                 canMove = false;
                 punching = true;
                 fist.position += transform.forward;
+                FindObjectOfType<AudioManager>().Play("Punch");
             }
         }
         if (punching)
@@ -325,6 +329,7 @@ public class ThirdPersonController : MonoBehaviour
                 direction = normalPunchVector;
                 targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 wallPunch = true;
+                FindObjectOfType<AudioManager>().Play("PunchWall");
             }
         }
         if (punching && punchCollision.HitSomething)
@@ -347,7 +352,7 @@ public class ThirdPersonController : MonoBehaviour
             punchEnd = true;
             fist.position -= transform.forward;
         }
-        // end of the punc
+        // end of the punch
         if (punchEnd && Time.time > timeStore + .85f)
         {
             canMove = true;
