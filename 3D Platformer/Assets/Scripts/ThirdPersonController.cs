@@ -50,6 +50,8 @@ public class ThirdPersonController : MonoBehaviour
     private int health = 10;
     private float deathTimeStore;
     private GameObject enemyObjectStore;
+    private bool wallJumpAnim;
+    private float wallJumpAnimTimeStore;
 
     public LayerMask wall;
     public LayerMask ground;
@@ -234,6 +236,10 @@ public class ThirdPersonController : MonoBehaviour
     {
         anim.SetBool("isGrounded", controller.isGrounded);
         anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
+        anim.SetBool("isGroundBonking", groundBonking);
+        anim.SetBool("isBonking", bonking);
+        anim.SetBool("isWallJumping", wallJumping);
+        anim.SetBool("resetWallJump", wallJumpAnim);
     }
    
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
@@ -249,6 +255,7 @@ public class ThirdPersonController : MonoBehaviour
                 direction = normalBonkVector;
                 targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 bonking = true;
+                wallJumping = false;
             }
         }
         if (bonking && Time.time < timeStore + .15f && Input.GetButtonDown("Jump"))
@@ -259,6 +266,13 @@ public class ThirdPersonController : MonoBehaviour
             transform.rotation = Quaternion.Euler(targetAngle, 0f, 0f);
             wallJumping = true;
             bonking = false;
+
+            wallJumpAnim = true;
+            wallJumpAnimTimeStore = Time.time;
+        }
+        if (Time.time > wallJumpAnimTimeStore + .1f)
+        {
+            wallJumpAnim = false;
         }
         if (wallJumping && controller.isGrounded)
         {
