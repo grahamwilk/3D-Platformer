@@ -6,7 +6,6 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Windows;
-using UnityEngine.UIElements;
 
 public class ThirdPersonController : MonoBehaviour
 {
@@ -50,9 +49,6 @@ public class ThirdPersonController : MonoBehaviour
     private int health = 10;
     private float deathTimeStore;
     private GameObject enemyObjectStore;
-    private bool wallJumpAnim;
-    private float wallJumpAnimTimeStore;
-    private bool ableToWallJump;
 
     public LayerMask wall;
     public LayerMask ground;
@@ -104,7 +100,6 @@ public class ThirdPersonController : MonoBehaviour
             groundBonking = true;
             playerHealth.Damage(2);
             timeStore = Time.time;
-            FindObjectOfType<AudioManager>().Play("PlayerDamage");
         }
     }
     // Retrieves the input from the player
@@ -138,7 +133,6 @@ public class ThirdPersonController : MonoBehaviour
         }
         if (Input.GetButtonDown("Jump") && (Physics.Raycast(transform.position, -Vector3.up, out hitInfo, 1.2f, ground) || controller.isGrounded) && !bonking && !groundBonking)
         {
-            FindObjectOfType<AudioManager>().Play("Jump");
             velocity.y = jumpForce;
         }
         // apply gravity and take previous vertical speed into account
@@ -168,7 +162,6 @@ public class ThirdPersonController : MonoBehaviour
                 if (cross.magnitude > .0001)
                 {
                     player.RotateAround(player.position, cross.normalized, vectorAngle);
-                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
                 Vector3 crossSide = Vector3.Cross(Vector3.up, normal);
                 Vector3 slopeVector = Vector3.Cross(normal, crossSide);
@@ -184,7 +177,6 @@ public class ThirdPersonController : MonoBehaviour
                 if (cross.magnitude > .0001)
                 {
                     player.RotateAround(player.position, cross.normalized, vectorAngle);
-                    transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, angle, transform.rotation.eulerAngles.z);
                 }
             }
             movementStore = Math.Sqrt(Math.Pow(moveDir.x, 2) + Math.Pow(moveDir.z, 2));
@@ -239,12 +231,6 @@ public class ThirdPersonController : MonoBehaviour
     {
         anim.SetBool("isGrounded", controller.isGrounded);
         anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
-        anim.SetBool("isGroundBonking", groundBonking);
-        anim.SetBool("isBonking", bonking);
-        anim.SetBool("isWallJumping", wallJumping);
-        anim.SetBool("resetWallJump", wallJumpAnim);
-        anim.SetBool("isAbleToWallJump", ableToWallJump);
-        anim.SetBool("isPunching", punching);
     }
    
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
@@ -260,8 +246,6 @@ public class ThirdPersonController : MonoBehaviour
                 direction = normalBonkVector;
                 targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 bonking = true;
-                wallJumping = false;
-                ableToWallJump = true;
             }
         }
         if (bonking && Time.time < timeStore + .15f && Input.GetButtonDown("Jump"))
@@ -272,17 +256,6 @@ public class ThirdPersonController : MonoBehaviour
             transform.rotation = Quaternion.Euler(targetAngle, 0f, 0f);
             wallJumping = true;
             bonking = false;
-            FindObjectOfType<AudioManager>().Play("WallJump");
-            wallJumpAnim = true;
-            wallJumpAnimTimeStore = Time.time;
-        }
-        if (bonking && Time.time > timeStore + .15f)
-        {
-            ableToWallJump = false;
-        }
-        if (Time.time > wallJumpAnimTimeStore + .1f)
-        {
-            wallJumpAnim = false;
         }
         if (wallJumping && controller.isGrounded)
         {
@@ -296,7 +269,6 @@ public class ThirdPersonController : MonoBehaviour
             groundBonking = true;
             wallJumping = false;
             timeStore = Time.time;
-            FindObjectOfType<AudioManager>().Play("WallBonk");
         }
         if (groundBonking && Time.time > timeStore + 1f)
         {
@@ -318,7 +290,6 @@ public class ThirdPersonController : MonoBehaviour
                 canMove = false;
                 punching = true;
                 fist.position += transform.forward;
-                FindObjectOfType<AudioManager>().Play("Punch");
             }
         }
         if (punching)
@@ -329,7 +300,6 @@ public class ThirdPersonController : MonoBehaviour
                 direction = normalPunchVector;
                 targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 wallPunch = true;
-                FindObjectOfType<AudioManager>().Play("PunchWall");
             }
         }
         if (punching && punchCollision.HitSomething)
@@ -352,8 +322,8 @@ public class ThirdPersonController : MonoBehaviour
             punchEnd = true;
             fist.position -= transform.forward;
         }
-        // end of the punch
-        if (punchEnd && Time.time > timeStore + .85f)
+        // end of the punc
+        if (punchEnd && Time.time > timeStore + .75f)
         {
             canMove = true;
             punchEnd = false;

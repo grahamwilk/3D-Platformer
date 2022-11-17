@@ -4,14 +4,5 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Dami's Assets/Scenes/LevelSelection.unity
-    guid: 1013af2915c875b4c81028b784855dee
-  - enabled: 1
-    path: Assets/Dami's Assets/Scenes/Level/Level 1.unity
-    guid: 580d9fa29e0df7547800e9a84d4a154e
-  - enabled: 1
-    path: Assets/Dami's Assets/Scenes/Level/Level 2.unity
-    guid: 5d7adc8268329904cb0c9e83ffc9c933
+  m_Scenes: []
   m_configObjects: {}
