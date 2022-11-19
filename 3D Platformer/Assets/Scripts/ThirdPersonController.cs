@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Windows;
@@ -65,6 +64,7 @@ public class ThirdPersonController : MonoBehaviour
     {
         // assign our Character Controller
         controller = GetComponent<CharacterController>();
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
