@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Dami's Assets/Scenes/Level/Level 2.unity
     guid: 9dd46b493c1396a42b3cf2aa11fde485
+  - enabled: 1
+    path: Assets/Dami's Assets/Scenes/TitleScreen.unity
+    guid: df14eefd820d6a84fb1e7ef87b039410
   m_configObjects: {}

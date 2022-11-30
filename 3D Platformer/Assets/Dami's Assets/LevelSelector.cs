@@ -13,7 +13,6 @@ public class LevelSelector : MonoBehaviour
         levelText.text = level.ToString();
     }
 
-    // Update is called once per frame
     public void OpenScene()
     {
         SceneManager.LoadScene("Level " + level.ToString());
