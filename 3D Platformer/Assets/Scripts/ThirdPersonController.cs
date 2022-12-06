@@ -248,7 +248,6 @@ public class ThirdPersonController : MonoBehaviour
         anim.SetBool("resetWallJump", wallJumpAnim);
         anim.SetBool("isAbleToWallJump", ableToWallJump);
         anim.SetBool("isPunching", punching);
-        anim.SetTrigger("attack", 
     }
    
     // if the player moves into a wall with a high enough speed, they will bonk off of it.
