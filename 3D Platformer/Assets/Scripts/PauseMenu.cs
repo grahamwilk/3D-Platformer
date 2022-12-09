@@ -28,14 +28,15 @@ public class PauseMenu : MonoBehaviour
 	{
 		pauseMenuUI.SetActive(false);
 		Time.timeScale = 1f;
-		GameIsPaused = false;
-
+        Cursor.lockState = CursorLockMode.Locked;
+        GameIsPaused = false;
 	}
 	void Pause()
 	{
 		pauseMenuUI.SetActive(true);
 		Time.timeScale = 0f;
-		GameIsPaused = true;
+        Cursor.lockState = CursorLockMode.None;
+        GameIsPaused = true;
 	}
 
 	public void QuitGame()

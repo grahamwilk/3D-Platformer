@@ -71,7 +71,6 @@ public class ThirdPersonController : MonoBehaviour
     void Update()
     {
         // Enironment Checks
-
         Debug.Log("Hello");
         WallBonkAndJump();
 
@@ -90,8 +89,6 @@ public class ThirdPersonController : MonoBehaviour
 
         // Methods for debugging
         DrawDebugLines();
-
-           
     }
     // if the player gets in contact with an enemy, this script runs
     void OnCollisionEnter(Collision collisionInfo)
@@ -309,8 +306,6 @@ public class ThirdPersonController : MonoBehaviour
             direction = Vector3.zero;
         }
     }
-   
-   
     // if the player presses a button, they will punch
     void Punch()
     {
